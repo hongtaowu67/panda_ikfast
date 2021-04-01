@@ -200,8 +200,11 @@ class PandaIKFast(object):
         quat = req.quat
         pos = req.pos
 
+        rospy.loginfo("Computing IK for ({}, {})".format(quat, pos))
+
         ik_sols = self.get_ik_solutions(quat, pos)
-        ik_rank, _ = PandaIKFast.rank_ik_sols(ik_sols)
+        rospy.loginfo("Got {} sets of IK solutions".format(ik_sols.shape))
+        ik_rank, ik_scores = self.rank_ik_sols(ik_sols)
 
         ik_sols = ik_sols.flatten()
 
@@ -213,7 +216,7 @@ class PandaIKFast(object):
         """
         self.s = rospy.Service("panda_ikfast", PandaIK, self.handle_panda_ikfast)
         rospy.sleep(0.5)
-        rospy.loginfo("panda_ikfast service ready")
+        rospy.loginfo("panda_ikfast service ready!")
         rate = rospy.Rate(1)
         rospy.spin()
 
