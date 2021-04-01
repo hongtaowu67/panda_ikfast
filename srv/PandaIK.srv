@@ -1,5 +1,5 @@
 float32[] quat
 float32[] pos
 ---
-float32[] ik_sols
-float32[] ik_ranks
+float64[] ik_sols
+uint32[] ik_rank
