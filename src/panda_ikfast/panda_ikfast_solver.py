@@ -26,11 +26,12 @@ class PandaIKFast(object):
 
         @type  env_xml: string
         @param env_xml: xml file of the environment
+        @type  obj_path: string
+        @param obj_path: path to the object .obj/.ply file
         """
-        #### Openrave setting ####
         # Environment
         self.env = orpy.Environment()
-        # self.env.SetViewer('qtcoin')
+        self.env.SetViewer('qtcoin')
         self.env.Load(env_xml)
         self.env.SetCollisionChecker(orpy.RaveCreateCollisionChecker(self.env, 'ode'))
         
@@ -53,9 +54,9 @@ class PandaIKFast(object):
         self.robot_go_home()
 
         # Object
+        self.obj = None
         if obj_path:
-            self.body = self.load_object(obj_path)
-        ###########################
+            self.obj = self.load_object(obj_path)
     
     def robot_go_home(self):
         """
@@ -200,6 +201,15 @@ class PandaIKFast(object):
         quat = req.quat
         pos = req.pos
 
+        # Setting the object pose
+        if self.obj:
+            obj_quat = req.obj_quat
+            obj_pos = req.obj_pos
+            T_obj = np.eye(4)
+            T_obj[:3, :3] = utils.quat2rotm(obj_quat)
+            T_obj[:3, 3]  = obj_pos
+            self.obj.SetTransform(T_obj)
+
         rospy.loginfo("Computing IK for ({}, {})".format(quat, pos))
 
         ik_sols = self.get_ik_solutions(quat, pos)
@@ -219,17 +229,3 @@ class PandaIKFast(object):
         rospy.loginfo("panda_ikfast service ready!")
         rate = rospy.Rate(1)
         rospy.spin()
-
-    
-# if __name__ == "__main__":
-#     env_xml = "/home/hongtao/panda_ws/src/panda_ikfast/xml/world.env.xml"
-#     obj_path = "/home/hongtao/Dropbox/ISRR2021_bear/training_data/0216_5/mesh.obj"
-#     PandaIKFast = PandaIKFast(env_xml, obj_path)
-    
-#     quat = np.array([0.521993830667, -0.315017999999, 0.764402798267, 0.20970088799])
-#     pos  = np.array([-0.245948463939, 0.251846808876, 0.233295196863])
-#     ik_sols = PandaIKFast.get_ik_solutions(quat, pos)
-#     ik_rank, score = PandaIKFast.rank_ik_sols(ik_sols)
-
-#     for ik_idx in ik_rank:
-#         print("{}: {}".format(score[ik_idx], ik_sols[ik_idx]))
