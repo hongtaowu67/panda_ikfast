@@ -1,5 +1,13 @@
+# Quaternion of the end effector (w, x, y, z)
 float32[] quat
+# Position of the end effector (x, y, z)
 float32[] pos
+# Quaternion of the object (w, x, y, z)
+float32[] obj_quat
+# Position of the end effector (x, y, z)
+float32[] obj_pos
 ---
+# List of ik solutions (7xn in length)
 float64[] ik_sols
+# Rand of each ik solutions (
 uint32[] ik_rank
