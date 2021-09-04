@@ -7,10 +7,11 @@ from panda_ikfast.panda_ikfast_solver import PandaIKFast
 if __name__ == "__main__":
     rospy.init_node("panda_ikfast_server")
 
-    cwd = os.getcwd()
+    env_xml = "/home/sisu/catkin_ws/src/panda_ikfast/xml/world.env.xml"
 
-    env_xml = "../xml/world.env.xml"
-    obj_path = None
-    PandaIKFast = PandaIKFast(env_xml, obj_path)
+    PandaIKFast = PandaIKFast(env_xml=env_xml)
+    PandaIKFast.run_load_object_server()
     PandaIKFast.run_panda_ikfast_server()
 
+    rate = rospy.Rate(1)
+    rospy.spin()

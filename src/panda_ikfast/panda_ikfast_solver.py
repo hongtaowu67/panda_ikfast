@@ -46,7 +46,7 @@ class PandaIKFast(object):
         self.open_gripper(1.0)
         self.disable_gripper()
 
-        self.robot_home_config = [0.0, 0.2, 0, -1.3, 0, 1.571, 0.785]
+        self.robot_home_config = [0.0, -np.pi / 4, 0, -2 * np.pi / 3, 0, np.pi / 3, np.pi / 4]
         self.robot_q_max = self.robot.GetDOFLimits()[0][0:7]
         self.robot_q_min = self.robot.GetDOFLimits()[1][0:7]
         self.q_lim_const = (self.robot_q_max - self.robot_q_min) * (self.robot_q_max - self.robot_q_min)
@@ -55,8 +55,6 @@ class PandaIKFast(object):
 
         # Object
         self.obj = None
-        if obj_path:
-            self.obj = self.load_object(obj_path)
     
     def robot_go_home(self):
         """
@@ -227,5 +225,20 @@ class PandaIKFast(object):
         self.s = rospy.Service("panda_ikfast", PandaIK, self.handle_panda_ikfast)
         rospy.sleep(0.5)
         rospy.loginfo("panda_ikfast service ready!")
-        rate = rospy.Rate(1)
-        rospy.spin()
+        
+    
+    def handle_load_object(self, req):
+        """
+        load object handler
+        """
+        obj_path = req.object_mesh_path
+        if obj_path:
+            self.obj = self.load_object(obj_path)
+        return LoadObjectResponse("Successfully load object!")
+
+    def run_load_object_server(self):
+        """
+        Initialize the load object service
+        """
+        self.load_object_server = rospy.Service("load_object", LoadObject, self.handle_load_object)
+        rospy.loginfo("load_object service ready!")
