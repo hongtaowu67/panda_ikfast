@@ -34,11 +34,20 @@ class PandaIKFast(object):
         self.env.SetViewer('qtcoin')
         self.env.Load(env_xml)
         self.env.SetCollisionChecker(orpy.RaveCreateCollisionChecker(self.env, 'ode'))
+
+        with self.env:
+            body = orpy.RaveCreateKinBody(self.env, '')
+            body.InitFromBoxes(np.array([[0.6, 0.0, -0.06, 1.0, 0.8, 0.1]]))
+            body.SetName("table")
+            self.env.AddKinBody(body)
+        
+        body.Enable(True)
         
         # Robot
         self.robot = self.env.GetRobot('panda')
 
-        self.manip_name= 'panda_arm_hand'
+        # self.manip_name= 'panda_arm_hand'
+        self.manip_name = 'panda_arm_hand_no_finger'
         self.manip = self.robot.SetActiveManipulator(self.manip_name)
         self.setup_ikfast()
         self.robot.Enable(True)
