@@ -20,14 +20,12 @@ class PandaIKFast(object):
     """
     Class to get IK solutions for Panda robot with IKFast (OpenRave)
     """
-    def __init__(self, env_xml, obj_path=None):
+    def __init__(self, env_xml):
         """
         Setting up OpenRave and ROS.
 
         @type  env_xml: string
         @param env_xml: xml file of the environment
-        @type  obj_path: string
-        @param obj_path: path to the object .obj/.ply file
         """
         # Environment
         self.env = orpy.Environment()
@@ -102,12 +100,16 @@ class PandaIKFast(object):
 
         return ik_solutions
 
-    def load_object(self, obj_path):
+    def load_object(self, obj_path, obj_quat, obj_pos):
         """
         Load object into the env.
 
         @type  obj_path: string
         @param obj_path: path to the object (.ply .obj)
+        @type  obj_quat: list
+        @param obj_path: object quaternion (w, x, y, z)
+        @type  obj_path: list
+        @param obj_path: object position
         @rtype: openravepy.KinBody
         @return: object
         """
@@ -120,6 +122,14 @@ class PandaIKFast(object):
             self.env.AddKinBody(body)
         
         body.Enable(True)
+
+        # Setting the object pose
+        obj_quat = obj_quat
+        obj_pos = obj_pos
+        T_obj = np.eye(4)
+        T_obj[:3, :3] = utils.quat2rotm(obj_quat)
+        T_obj[:3, 3]  = obj_pos
+        self.obj.SetTransform(T_obj)
 
         return body
 
@@ -241,8 +251,12 @@ class PandaIKFast(object):
         load object handler
         """
         obj_path = req.object_mesh_path
+        obj_quat = req.object_quat
+        obj_pos  = req.object_pos
+
         if obj_path:
-            self.obj = self.load_object(obj_path)
+            self.obj = self.load_object(obj_path, obj_quat, obj_pos)
+
         return LoadObjectResponse("Successfully load object!")
 
     def run_load_object_server(self):

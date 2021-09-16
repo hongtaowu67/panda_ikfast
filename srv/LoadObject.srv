@@ -1,3 +1,5 @@
 string object_mesh_path
+float32[] object_pos
+float32[] object_quat
 ---
 string status
