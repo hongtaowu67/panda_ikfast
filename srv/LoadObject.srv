@@ -1,4 +1,5 @@
 string object_mesh_path
+string object_name
 float32[] object_pos
 float32[] object_quat
 ---

@@ -100,12 +100,14 @@ class PandaIKFast(object):
 
         return ik_solutions
 
-    def load_object(self, obj_path, obj_quat, obj_pos):
+    def load_object(self, obj_path, obj_name, obj_quat, obj_pos):
         """
         Load object into the env.
 
         @type  obj_path: string
         @param obj_path: path to the object (.ply .obj)
+        @type  obj_name: string
+        @param obj_name: name of the object
         @type  obj_quat: list
         @param obj_path: object quaternion (w, x, y, z)
         @type  obj_path: list
@@ -118,7 +120,7 @@ class PandaIKFast(object):
         with self.env:
             body = orpy.RaveCreateKinBody(self.env, '')
             body.InitFromTrimesh(trimesh=orpy.TriMesh(mesh.vertices, mesh.faces), draw=True)
-            body.SetName("chair")
+            body.SetName(obj_name)
             self.env.AddKinBody(body)
         
         body.Enable(True)
@@ -129,7 +131,9 @@ class PandaIKFast(object):
         T_obj = np.eye(4)
         T_obj[:3, :3] = utils.quat2rotm(obj_quat)
         T_obj[:3, 3]  = obj_pos
-        self.obj.SetTransform(T_obj)
+        body.SetTransform(T_obj)
+
+        rospy.loginfo("Loaded %s..." % (obj_name))
 
         return body
 
@@ -251,11 +255,12 @@ class PandaIKFast(object):
         load object handler
         """
         obj_path = req.object_mesh_path
+        obj_name = req.object_name
         obj_quat = req.object_quat
         obj_pos  = req.object_pos
 
         if obj_path:
-            self.obj = self.load_object(obj_path, obj_quat, obj_pos)
+            self.obj = self.load_object(obj_path, obj_name, obj_quat, obj_pos)
 
         return LoadObjectResponse("Successfully load object!")
 
