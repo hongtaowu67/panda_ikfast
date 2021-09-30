@@ -31,7 +31,7 @@ class PandaIKFast(object):
 
         with self.env:
             body = orpy.RaveCreateKinBody(self.env, '')
-            body.InitFromBoxes(np.array([[0.6, 0.0, -0.06, 1.0, 0.8, 0.1]]))
+            body.InitFromBoxes(np.array([[0.6, 0.0, -0.01, 1.0, 0.8, 0.01]]))
             body.SetName("table")
             self.env.AddKinBody(body)
         
@@ -135,6 +135,7 @@ class PandaIKFast(object):
     def remove_object(self):
         """ Remove object from the scene. """
         self.env.RemoveKinBody(self.obj)
+        rospy.loginfo("Object removed from the scene...")
 
     def check_collision(self, joint_values):
         """ Check robot collision.
@@ -257,10 +258,10 @@ class PandaIKFast(object):
     def handle_remove_object(self, req):
         """ Remove object handler. """
         self.remove_object()
-        return RemoveObjectResponse("Successfully remove object...")
+        return RemoveObjectIKResponse("Successfully remove object...")
 
     def run_handle_object_server(self):
         """ Initialize the load object service. """
         self.load_object_server = rospy.Service("load_object", LoadObject, self.handle_load_object)
-        self.remove_object_server = rospy.Service("remove_object", RemoveObject, self.handle_remove_object)
+        self.remove_object_server = rospy.Service("remove_object_ik", RemoveObjectIK, self.handle_remove_object)
         rospy.loginfo("load_object and remove_object service ready...")
