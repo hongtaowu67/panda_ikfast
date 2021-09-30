@@ -4,6 +4,7 @@ Author: Hongtao Wu, Johns Hopkins University
 Date: Apr 1, 2021
 """
 
+import os
 import numpy as np
 import openravepy as orpy
 import trimesh
@@ -115,6 +116,11 @@ class PandaIKFast(object):
         @rtype: openravepy.KinBody
         @return: object
         """
+        # Wait for the file
+        while True:
+            if os.path.exists(obj_path):
+                break
+        
         mesh = trimesh.load(obj_path)
         
         with self.env:
