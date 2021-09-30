@@ -1,8 +1,7 @@
-"""
-IKFast service for the Panda robot
-Author: Hongtao Wu, Johns Hopkins University
-Date: Apr 1, 2021
-"""
+# IKFast service for the Panda robot
+# Author: Hongtao Wu
+# Johns Hopkins University
+# Date: Apr 1, 2021
 
 import os
 import numpy as np
@@ -18,12 +17,8 @@ from panda_ikfast.srv import *
 IK_CHECK_COLLISION = orpy.IkFilterOptions.CheckEnvCollisions
 
 class PandaIKFast(object):
-    """
-    Class to get IK solutions for Panda robot with IKFast (OpenRave)
-    """
     def __init__(self, env_xml):
-        """
-        Setting up OpenRave and ROS.
+        """ Class to get IK solutions for Panda robot with IKFast (OpenRave).
 
         @type  env_xml: string
         @param env_xml: xml file of the environment
@@ -65,15 +60,11 @@ class PandaIKFast(object):
         self.obj = None
     
     def robot_go_home(self):
-        """
-        Move the robot to home configuration.
-        """
+        """ Move the robot to home configuration. """
         self.robot.SetActiveDOFValues(self.robot_home_config)
 
     def setup_ikfast(self):
-        """
-        Generate/Load the IKFast model.
-        """
+        """ Generate/Load the IKFast model. """
         ikmodel = orpy.databases.inversekinematics.InverseKinematicsModel(
             self.robot, iktype=orpy.IkParameterization.Type.Transform6D)
         if (not ikmodel.load()):
@@ -84,8 +75,7 @@ class PandaIKFast(object):
             print('Finish generating IK model for [{}]'.format(robot_name))
     
     def get_ik_solutions(self, quat, pos):
-        """
-        Get the IK solutions for a pose.
+        """ Get the IK solutions for a pose.
 
         @type  quat: list
         @param quat: quaternion in (qw, qx, qy, qz)
@@ -102,8 +92,7 @@ class PandaIKFast(object):
         return ik_solutions
 
     def load_object(self, obj_path, obj_name, obj_quat, obj_pos):
-        """
-        Load object into the env.
+        """ Load object into the env.
 
         @type  obj_path: string
         @param obj_path: path to the object (.ply .obj)
@@ -142,10 +131,13 @@ class PandaIKFast(object):
         rospy.loginfo("Loaded %s..." % (obj_name))
 
         return body
+    
+    def remove_object(self):
+        """ Remove object from the scene. """
+        self.env.RemoveKinBody(self.obj)
 
     def check_collision(self, joint_values):
-        """
-        Check robot collision.
+        """ Check robot collision.
 
         @type  joint_values: numpy.ndarray
         @param joint_values: joint configuration value
@@ -159,8 +151,7 @@ class PandaIKFast(object):
         return is_collision
 
     def open_gripper(self, scale):
-        """
-        Open the gripper. Franka Emika Panda robot.
+        """ Open the gripper. Franka Emika Panda robot.
         
         @type  scale: float
         @param scale: open scale, [0, 1]
@@ -179,8 +170,7 @@ class PandaIKFast(object):
         self.robot.SetActiveDOFValues(goal_config)
 
     def disable_gripper(self):
-        """
-        Disable the DOF at the hand.
+        """ Disable the DOF at the hand.
         
         @type  robot: openrave.Robot
         @param robot: Robot to be configure
@@ -188,8 +178,7 @@ class PandaIKFast(object):
         self.robot.SetActiveDOFs(self.manip.GetArmIndices())
 
     def rank_ik_sols(self, ik_list):
-        """
-        Rank the ik solutions based on joint limits and manipulability
+        """ Rank the ik solutions based on joint limits and manipulability
 
         @type  ik_list: numpy.ndarray
         @param ik_list: list of ik solution
@@ -222,9 +211,7 @@ class PandaIKFast(object):
         return rank[-len(rank):][::-1], score
 
     def handle_panda_ikfast(self, req):
-        """
-        ROS service handler
-        """
+        """ ROS service handler. """
         quat = req.quat
         pos = req.pos
 
@@ -253,13 +240,10 @@ class PandaIKFast(object):
         """
         self.s = rospy.Service("panda_ikfast", PandaIK, self.handle_panda_ikfast)
         rospy.sleep(0.5)
-        rospy.loginfo("panda_ikfast service ready!")
+        rospy.loginfo("panda_ikfast service ready...")
         
-    
     def handle_load_object(self, req):
-        """
-        load object handler
-        """
+        """ Load object handler. """
         obj_path = req.object_mesh_path
         obj_name = req.object_name
         obj_quat = req.object_quat
@@ -268,11 +252,15 @@ class PandaIKFast(object):
         if obj_path:
             self.obj = self.load_object(obj_path, obj_name, obj_quat, obj_pos)
 
-        return LoadObjectResponse("Successfully load object!")
+        return LoadObjectResponse("Successfully load object...")
+    
+    def handle_remove_object(self, req):
+        """ Remove object handler. """
+        self.remove_object()
+        return RemoveObjectResponse("Successfully remove object...")
 
-    def run_load_object_server(self):
-        """
-        Initialize the load object service
-        """
+    def run_handle_object_server(self):
+        """ Initialize the load object service. """
         self.load_object_server = rospy.Service("load_object", LoadObject, self.handle_load_object)
-        rospy.loginfo("load_object service ready!")
+        self.remove_object_server = rospy.Service("remove_object", RemoveObject, self.handle_remove_object)
+        rospy.loginfo("load_object and remove_object service ready...")

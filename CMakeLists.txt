@@ -59,6 +59,7 @@ add_service_files(
   FILES
   PandaIK.srv
   LoadObject.srv
+  RemoveObject.srv
 )
 
 ## Generate actions in the 'action' folder
