@@ -58,6 +58,8 @@ catkin_python_setup()
 add_service_files(
   FILES
   PandaIK.srv
+  LoadObject.srv
+  RemoveObjectIK.srv
 )
 
 ## Generate actions in the 'action' folder

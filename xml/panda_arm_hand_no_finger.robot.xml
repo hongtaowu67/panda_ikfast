@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Robot name="panda_arm_hand_no_finger">
+  
+  <!-- Include components (bottom-up) -->
+  <!-- Panda -->
+  <Robot file="panda_arm_hand_no_finger.dae"></Robot>
+  
+  <Manipulator name="panda_arm_hand_no_finger">
+    <base>panda_link0</base>
+    <effector>panda_hand</effector>
+    <translation>0.0 0.0 0.0</translation>
+  </Manipulator>
+
+</Robot>

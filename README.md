@@ -45,3 +45,6 @@ catkin_make
 rosrun panda_ikfast panda_ikfast_server_node.py
 ```
 __Note: The return ik_sols is a 1-dim array. The length is 7xn. And each 7 elements is an IK solution. The rank of the solutions is in ik_ranks (descending order).__
+
+## TODO
+- [ ] add service to load object
