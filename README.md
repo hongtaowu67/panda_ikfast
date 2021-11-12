@@ -15,6 +15,10 @@ pip install trimesh
 pip install numpy
 ```
 4. [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu)
+5. sympy (0.7.1)
+    ```
+    pip install sympy==0.7.1
+    ```
 
 ## Usage
 
